@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import Button from "@/components/Button";
+import CartIcon from "@/components/icons/CartIcon";
 import Link from "next/link";
 import { useContext } from "react";
 import { CartContext } from "@/components/CartContext";
@@ -48,6 +49,11 @@ const Price = styled.div`
     font-size: 1rem;
     font-weight: 400;
     text-align: right;
+    @media screen and (min-width: 768px) {
+        font-size: 1.2rem;
+        font-weight: 600;
+        text-align: left;
+    }
 `;
 
 export default function ProductBox({ _id, title, description, price, images }) {
@@ -64,6 +70,7 @@ export default function ProductBox({ _id, title, description, price, images }) {
                 <Title href={url}>{title}</Title>
                 <PriceRow>
                     <Price>${price}</Price>
+                    
                     <Button
                         block
                         onClick={() => addProduct(_id)}
