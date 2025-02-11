@@ -1,11 +1,12 @@
 import styled from "styled-components";
-import Button from "@/components/Button";
+import Button, { ButtonStyle } from "@/components/Button";
 import CartIcon from "@/components/icons/CartIcon";
 import Link from "next/link";
 import { useContext } from "react";
 import { CartContext } from "@/components/CartContext";
+import FlyingButton from "./FlyingButton";
 
-const ProductWrapper = styled.div``;
+export const ProductWrapper = styled.div``;
 
 const WhiteBox = styled(Link)`
     background-color: #fff;
@@ -35,14 +36,12 @@ const ProductInfoBox = styled.div`
 `;
 
 const PriceRow = styled.div`
-    display: block;
+    display: flex;
     @media screen and (min-width: 768px) {
         display: flex;
         gap: 5px;
     }
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 2px;
+    flex-direction: column;
 `;
 
 const Price = styled.div`
@@ -59,6 +58,11 @@ const Price = styled.div`
 export default function ProductBox({ _id, title, description, price, images }) {
     const { addProduct } = useContext(CartContext);
     const url = "/product/" + _id;
+    function truncateTitle(title, maxLength = 23) {
+        return title.length > maxLength
+            ? title.substring(0, maxLength) + "..."
+            : title;
+    }
     return (
         <ProductWrapper>
             <WhiteBox href={url}>
@@ -67,18 +71,12 @@ export default function ProductBox({ _id, title, description, price, images }) {
                 </div>
             </WhiteBox>
             <ProductInfoBox>
-                <Title href={url}>{title}</Title>
+                <Title href={url}>{truncateTitle(title)}</Title>
                 <PriceRow>
                     <Price>${price}</Price>
-                    
-                    <Button
-                        block
-                        onClick={() => addProduct(_id)}
-                        primary
-                        outline
-                    >
+                    <FlyingButton _id={_id} src={images?.[0]}>
                         Add to cart
-                    </Button>
+                    </FlyingButton>
                 </PriceRow>
             </ProductInfoBox>
         </ProductWrapper>
