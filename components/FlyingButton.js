@@ -6,6 +6,7 @@ import { useContext } from "react";
 import { CartContext } from "./CartContext";
 
 const FlyingButtonWrapper = styled.div`
+    z-index: 999;
     button {
         ${ButtonStyle}
         ${(props) =>
