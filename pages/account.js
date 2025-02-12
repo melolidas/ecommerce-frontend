@@ -8,6 +8,7 @@ import Input from "@/components/Input";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Spinner from "@/components/Spinner";
+import ProductBox from "@/components/ProductBox";
 
 const ColsWrapper = styled.div`
     display: grid;
@@ -39,30 +40,51 @@ export default function AccountPage() {
     const [streetAddress, setStreetAddress] = useState("");
     const [country, setCountry] = useState("");
     const [addressLoaded, setAddressLoaded] = useState(true);
+    const [wishlistLoaded, setWishlistLoaded] = useState(true);
+    const [wishedProducts, setWishedProducts] = useState([]);
+
+    useEffect(() => {
+        if (!session) {
+            return;
+        }
+        setWishlistLoaded(false);
+        setAddressLoaded(false);
+        axios.get("/api/address").then((response) => {
+            const { name, email, city, postalCode, streetAddress, country } =
+                response.data;
+            setName(name);
+            setEmail(email);
+            setCity(city);
+            setPostalCode(postalCode);
+            setStreetAddress(streetAddress);
+            setCountry(country);
+            setAddressLoaded(true);
+        });
+
+        axios.get("/api/wishlist").then((response) => {
+            setWishedProducts(response.data.map((wp) => wp.product));
+            setWishlistLoaded(true);
+        });
+    }, [session]);
 
     async function logout() {
-        await signOut({
-            callbackUrl: process.env.NEXT_PUBLIC_URL,
-        });
+        await signOut({ callbackUrl: process.env.NEXT_PUBLIC_URL });
     }
+
     async function login() {
         await signIn("google");
     }
+
     function saveAddress() {
         const data = { name, email, city, streetAddress, postalCode, country };
         axios.put("/api/address", data);
     }
-    useEffect(() => {
-        axios.get("/api/address").then((response) => {
-            setName(response.data.name);
-            setEmail(response.data.email);
-            setCity(response.data.city);
-            setPostalCode(response.data.postalCode);
-            setStreetAddress(response.data.streetAddress);
-            setCountry(response.data.country);
-            setAddressLoaded(true);
-        });
-    }, []);
+
+    function productRemovedFromWishlist(idToRemove) {
+        setWishedProducts((products) =>
+            products.filter((p) => p._id.toString() !== idToRemove)
+        );
+    }
 
     return (
         <>
@@ -70,7 +92,45 @@ export default function AccountPage() {
             <Center>
                 <ColsWrapper>
                     <div>
-                        <WhiteBox>WishList</WhiteBox>
+                        <WhiteBox>
+                            <>
+                                {!wishlistLoaded && (
+                                    <Spinner fullWidth={true} />
+                                )}
+                                {wishlistLoaded && (
+                                    <>
+                                        <WishedProductsGrid>
+                                            {wishedProducts.length > 0 &&
+                                                wishedProducts.map((wp) => (
+                                                    <ProductBox
+                                                        key={wp._id}
+                                                        {...wp}
+                                                        wished={true}
+                                                        onRemoveFromWishlist={
+                                                            productRemovedFromWishlist
+                                                        }
+                                                    />
+                                                ))}
+                                        </WishedProductsGrid>
+                                        {wishedProducts.length === 0 && (
+                                            <>
+                                                {session && (
+                                                    <p>
+                                                        Your wishlist is empty
+                                                    </p>
+                                                )}
+                                                {!session && (
+                                                    <p>
+                                                        Login to add products to
+                                                        your wishlist
+                                                    </p>
+                                                )}
+                                            </>
+                                        )}
+                                    </>
+                                )}
+                            </>
+                        </WhiteBox>
                     </div>
                     <div>
                         <WhiteBox>
