@@ -3,38 +3,28 @@ import { Product } from "@/models/Product";
 
 export default async function handle(req, res) {
     await mongooseConnect();
+    const { categories, sort, phrase, ...filters } = req.query;
+    let [sortField, sortOrder] = (sort || "_id-desc").split("-");
 
-    try {
-        const { categories, sort, ...filters } = req.query;
-        const productsQuery = {};
-
-        if (categories) {
-            productsQuery.category = { $in: categories.split(",") };
-        }
-
-        if (Object.keys(filters).length > 0) {
-            Object.entries(filters).forEach(([key, value]) => {
-                if (value) {
-                    productsQuery[`properties.${key}`] = value;
-                }
-            });
-        }
-
-        let sortOptions = {};
-        if (sort && sort.includes("-")) {
-            const [sortField, sortOrder] = sort.split("-");
-            if (sortField && (sortOrder === "asc" || sortOrder === "desc")) {
-                sortOptions[sortField] = sortOrder === "asc" ? 1 : -1;
-            }
-        }
-
-        const products = await Product.find(productsQuery, null, {
-            sort: sortOptions,
-        });
-
-        res.json(products);
-    } catch (error) {
-        console.error("Ошибка при получении товаров:", error);
-        res.status(500).json({ error: "Внутренняя ошибка сервера" });
+    const productsQuery = {};
+    if (categories) {
+        productsQuery.category = categories.split(",");
     }
+    if (phrase) {
+        productsQuery["$or"] = [
+            { title: { $regex: phrase, $options: "i" } },
+            { description: { $regex: phrase, $options: "i" } },
+        ];
+    }
+    if (Object.keys(filters).length > 0) {
+        Object.keys(filters).forEach((filterName) => {
+            productsQuery["properties." + filterName] = filters[filterName];
+        });
+    }
+    console.log(productsQuery);
+    res.json(
+        await Product.find(productsQuery, null, {
+            sort: { [sortField]: sortOrder === "asc" ? 1 : -1 },
+        })
+    );
 }
