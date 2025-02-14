@@ -2,7 +2,7 @@ import Center from "@/components/Center";
 import styled from "styled-components";
 import ButtonLink from "@/components/ButtonLink";
 import CartIcon from "@/components/icons/CartIcon";
-import FlyingButton from "./FlyingButton";
+import FlyingButton from "@/components/FlyingButton";
 
 const Bg = styled.div`
     background-color: #222;
@@ -25,7 +25,7 @@ const ColumnsWrapper = styled.div`
     display: grid;
     grid-template-columns: 1fr;
     gap: 40px;
-    img {
+    img.main {
         max-width: 100%;
         max-height: 200px;
         display: block;
@@ -33,10 +33,12 @@ const ColumnsWrapper = styled.div`
     }
     div:nth-child(1) {
         order: 2;
+        margin-left: auto;
+        margin-right: auto;
     }
     @media screen and (min-width: 768px) {
         grid-template-columns: 1.1fr 0.9fr;
-        div:nth-child(1) {
+        & > div:nth-child(1) {
             order: 0;
         }
         img {
@@ -53,6 +55,20 @@ const ButtonsWrapper = styled.div`
     gap: 10px;
     margin-top: 25px;
 `;
+const CenterImg = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+`;
+
+const ImgColumn = styled(Column)`
+    & > div {
+        width: 100%;
+    }
+`;
+
+const ContentWrapper = styled.div``;
 
 export default function Featured({ product }) {
     return (
@@ -61,33 +77,38 @@ export default function Featured({ product }) {
                 <ColumnsWrapper>
                     <Column>
                         <div>
-                            <Title>{product.title}</Title>
-                            <Desc>{product.description}</Desc>
-                            <ButtonsWrapper>
-                                <ButtonLink
-                                    href={"/product/" + product._id}
-                                    outline={1}
-                                    white={1}
-                                >
-                                    Read more
-                                </ButtonLink>
-                                <FlyingButton
-                                    white
-                                    _id={product._id}
-                                    src={product.images?.[0]}
-                                >
-                                    <CartIcon />
-                                    Add to cart
-                                </FlyingButton>
-                            </ButtonsWrapper>
+                            <ContentWrapper>
+                                <Title>{product.title}</Title>
+                                <Desc>{product.description}</Desc>
+                                <ButtonsWrapper>
+                                    <ButtonLink
+                                        href={"/product/" + product._id}
+                                        outline={1}
+                                        white={1}
+                                    >
+                                        Read more
+                                    </ButtonLink>
+                                    <FlyingButton
+                                        white={1}
+                                        _id={product._id}
+                                        src={product.images?.[0]}
+                                    >
+                                        <CartIcon />
+                                        Add to cart
+                                    </FlyingButton>
+                                </ButtonsWrapper>
+                            </ContentWrapper>
                         </div>
                     </Column>
-                    <Column>
-                        <img
-                            src="https://dawid-next-ecommerce.s3.amazonaws.com/1679151719649.png"
-                            alt=""
-                        />
-                    </Column>
+                    <ImgColumn>
+                        <CenterImg>
+                            <img
+                                className={"main"}
+                                src={product.images?.[0]}
+                                alt=""
+                            />
+                        </CenterImg>
+                    </ImgColumn>
                 </ColumnsWrapper>
             </Center>
         </Bg>
