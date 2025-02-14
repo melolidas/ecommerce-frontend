@@ -1,11 +1,12 @@
-import Featured from "@/components/Featured";
 import Header from "@/components/Header";
-import NewProducts from "@/components/NewProducts";
-import { mongooseConnect } from "@/lib/mongoose";
+import Featured from "@/components/Featured";
 import { Product } from "@/models/Product";
+import { mongooseConnect } from "@/lib/mongoose";
+import NewProducts from "@/components/NewProducts";
 import { WishedProduct } from "@/models/WishedProduct";
 import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { Setting } from "@/models/Setting";
 
 export default function HomePage({
     featuredProduct,
@@ -25,8 +26,11 @@ export default function HomePage({
 }
 
 export async function getServerSideProps(ctx) {
-    const featuredProductId = "679bde9132b0ef5b71cec006";
     await mongooseConnect();
+    const featuredProductSetting = await Setting.findOne({
+        name: "featuredProductId",
+    });
+    const featuredProductId = featuredProductSetting.value;
     const featuredProduct = await Product.findById(featuredProductId);
     const newProducts = await Product.find({}, null, {
         sort: { _id: -1 },
