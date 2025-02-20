@@ -12,6 +12,7 @@ const SearchInput = styled(Input)`
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 1.4rem;
+    z-index: 999;
 `;
 const InputWrapper = styled.div`
     position: sticky;
@@ -56,7 +57,7 @@ export default function SearchPage() {
                     />
                 </InputWrapper>
                 {!isLoading && phrase !== "" && products.length === 0 && (
-                    <h2>No products found for query "{phrase}"</h2>
+                    <h2>No products found for query &quot;{phrase}&quot;</h2>
                 )}
                 {isLoading && <Spinner fullWidth={true} />}
                 {!isLoading && products.length > 0 && (
