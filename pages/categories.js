@@ -59,7 +59,7 @@ export default function CategoriesPage({
             <Header />
             <Center>
                 {mainCategories.map((cat) => (
-                    <CategoryWrapper>
+                    <CategoryWrapper key={cat._id}>
                         <CategoryTitle>
                             <h2>{cat.name}</h2>
                             <div>
@@ -69,8 +69,9 @@ export default function CategoriesPage({
                             </div>
                         </CategoryTitle>
                         <CategoryGrid>
-                            {categoriesProducts[cat._id].map((p) => (
+                            {categoriesProducts[cat._id]?.map((p) => (
                                 <ProductBox
+                                    key={p._id}
                                     {...p}
                                     wished={wishedProducts.includes(p._id)}
                                 />
@@ -111,7 +112,7 @@ export async function getServerSideProps(ctx) {
     const session = await getServerSession(ctx.req, ctx.res, authOptions);
     const wishedProducts = session?.user
         ? await WishedProduct.find({
-              userEmail: session?.user.email,
+              userEmail: session?.user?.email,
               product: allFetchedProductsId,
           })
         : [];

@@ -28,7 +28,7 @@ export default function SingleOrder({ line_items, createdAt, ...rest }) {
     return (
         <StyledOrder>
             <div>
-                <time>{new Date(createdAt).toLocaleString("sv-SE")}</time>
+                <time>{new Date(createdAt).toLocaleString("ru-KG")}</time>
                 <Address>
                     {rest.name}
                     <br />
@@ -41,7 +41,7 @@ export default function SingleOrder({ line_items, createdAt, ...rest }) {
             </div>
             <div>
                 {line_items.map((item) => (
-                    <ProductRow>
+                    <ProductRow key={item.price_data.product_data.name}>
                         <span>{item.quantity} x </span>
                         {item.price_data.product_data.name}
                     </ProductRow>
